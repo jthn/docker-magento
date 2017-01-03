@@ -6,8 +6,22 @@ RUN cd /tmp && curl https://codeload.github.com/OpenMage/magento-mirror/tar.gz/$
 
 RUN chown -R www-data:www-data /var/www/htdocs
 
-RUN apt-get update && apt-get install -y mysql-client-5.5 libxml2-dev
+RUN echo "alias ll='ls -l'" >> ~/.bashrc
+
+RUN apt-get update && apt-get install -y \
+  mysql-client-5.5 \
+  libxml2-dev \
+  git
+
 RUN docker-php-ext-install soap
+
+# Install modman
+COPY ./modman /usr/local/bin/modman
+RUN chmod +x /usr/local/bin/modman
+
+# Install template patch
+RUN modman init
+RUN modman clone template-patch https://gist.github.com/35c0d32dd651c4c8c840.git
 
 COPY ./bin/install-magento /usr/local/bin/install-magento
 #COPY redis.conf /var/www/htdocs/app/etc/
